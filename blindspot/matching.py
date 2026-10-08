@@ -1,6 +1,5 @@
 """Equipment/time gated maintenance matching with semantic similarity."""
 import os
-import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import AgglomerativeClustering
@@ -48,13 +47,15 @@ def cluster_patterns(anomalies: list[dict], logs) -> dict:
     return {"patterns": patterns, "semantic_backend": backend}
 
 def match_logs(anomaly: dict, logs) -> dict:
-    eligible = logs[(logs.equipment_id == anomaly["equipment_id"]) & ((logs.hour - anomaly["hour"]).abs() <= 24)]
+    eligible = logs[(logs.equipment_id == anomaly["equipment_id"]) & (logs.hour <= anomaly["observation_cutoff_hour"]) & ((logs.hour - anomaly["hour"]).abs() <= 24)]
     descriptions = eligible.description.tolist()
     scores, backend = similarities(anomaly["description"], descriptions)
     matches = []
     for (_, log), score in zip(eligible.iterrows(), scores):
         # Identity and time are hard gates. A report is confirmed only if its structured
         # failure field says so; semantic similarity alone never confirms a failure.
-        matches.append({"id": log.id, "timestamp": log.timestamp, "description": log.description, "similarity": round(score, 3), "match_status": "confirmed_report" if log.is_failure_report else "possible_semantic_match", "maintenance_action": log.maintenance_action})
+        matches.append({"id": log.id, "timestamp": log.timestamp, "description": log.description, "similarity": round(score, 3), "match_status": "confirmed_record_match" if log.is_failure_report else "possible_semantic_match", "timing": "later_reported" if log.hour > anomaly["hour"] else "known_at_detection", "failure_verified": bool(log.confirmed_cause), "maintenance_action": log.maintenance_action})
     matches.sort(key=lambda x: x["similarity"], reverse=True)
-    return {"matches": matches, "reporting_status": "reported" if any(x["match_status"] == "confirmed_report" for x in matches) else "unreported_candidate", "semantic_backend": backend}
+    related = [x for x in matches if x["match_status"] == "confirmed_record_match"]
+    status = "reported" if any(x["timing"] == "known_at_detection" for x in related) else "later_reported" if related else "unreported_candidate"
+    return {"matches": matches, "reporting_status": status, "semantic_backend": backend}

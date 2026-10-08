@@ -1,5 +1,4 @@
 """Small SQLite store for review decisions; generated telemetry stays reproducible."""
-import json
 import sqlite3
 from pathlib import Path
 

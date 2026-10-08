@@ -43,3 +43,25 @@ def test_false_alarm_and_validation(tmp_path):
     assert client.get("/api/anomalies/does-not-exist").status_code == 404
     filters = client.get("/api/anomalies", params={"component": "bearing", "reporting_status": "unreported_candidate"}).json()
     assert filters and all(a["component"] == "bearing" and a["reporting_status"] == "unreported_candidate" for a in filters)
+
+def test_snapshot_matching_and_review_boundaries(tmp_path):
+    client = TestClient(create_app(str(tmp_path / "reviews.sqlite3")))
+    anomalies = client.get("/api/anomalies").json()
+    reported = next(a for a in anomalies if a["split"] == "train" and a["reporting_status"] == "reported")
+    matches = client.get(f"/api/anomalies/{reported['id']}/matches").json()["matches"]
+    assert matches and all(not m["id"].endswith("CLOSED") for m in matches)
+    detail = client.get(f"/api/anomalies/{reported['id']}").json()
+    assert max(point["hour"] for point in detail["telemetry"]) <= reported["hour"]
+    held_out = next(a for a in anomalies if a["split"] == "test")
+    assert client.post(f"/api/anomalies/{held_out['id']}/review", json={"decision": "normal_behavior"}).status_code == 403
+    underreported = next(a for a in anomalies if a["equipment_id"] == "V02-BEARING-01")
+    wrong_category = client.post(f"/api/anomalies/{underreported['id']}/review", json={"decision": "confirmed_issue", "failure_category": "pump cavitation", "evidence_type": "actual_failure"}).json()
+    assert wrong_category["training_eligible"] is False
+
+def test_open_complaint_does_not_create_failure_labels():
+    sim = generate()
+    train = sim.telemetry[sim.telemetry.split == "train"]
+    before = supervised_labels(train, sim).sum()
+    confirmed_equipment = sim.logs.loc[sim.logs.confirmed_cause.notna(), "equipment_id"].iloc[0]
+    sim.logs = sim.logs[~((sim.logs.equipment_id == confirmed_equipment) & sim.logs.confirmed_cause.notna())]
+    assert supervised_labels(train, sim).sum() == before - 24

@@ -40,14 +40,23 @@ def generate() -> Simulation:
             if reported:
                 symptoms = f"Increasing {component} noise and heat under load"
                 logs.append({"id": f"L-{equipment_id}-FAIL", "vessel_id": f"V{vessel:02d}", "equipment_id": equipment_id, "hour": 128, "timestamp": (start + pd.Timedelta(hours=128)).isoformat(), "description": symptoms, "symptoms": "noise, heat", "suspected_failure_mode": truth[equipment_id]["failure_category"], "confirmed_cause": None, "maintenance_action": "inspection requested", "is_failure_report": True})
+                logs.append({"id": f"L-{equipment_id}-CLOSED", "vessel_id": f"V{vessel:02d}", "equipment_id": equipment_id, "hour": 140, "timestamp": (start + pd.Timedelta(hours=140)).isoformat(), "description": f"{component} failure confirmed during repair", "symptoms": "noise, heat", "suspected_failure_mode": truth[equipment_id]["failure_category"], "confirmed_cause": truth[equipment_id]["failure_category"], "maintenance_action": "component replaced; work order closed", "is_failure_report": True})
             if vessel % 2 == 0:
                 logs.append({"id": f"L-{equipment_id}-ROUTINE", "vessel_id": f"V{vessel:02d}", "equipment_id": equipment_id, "hour": 65, "timestamp": (start + pd.Timedelta(hours=65)).isoformat(), "description": f"Routine {component} inspection; no defect found", "symptoms": "none", "suspected_failure_mode": None, "confirmed_cause": None, "maintenance_action": "routine inspection", "is_failure_report": False})
     df = pd.DataFrame(rows).sort_values(["equipment_id", "hour"]).reset_index(drop=True)
-    # Calibrate each machine from its own first 70 healthy hours, using only
-    # measurements available before any simulated degradation begins.
-    initial = df[df.hour < 70].copy()
-    initial["load_adjusted_temperature"] = initial.temperature_mean - 0.15 * initial.operating_load
-    equipment_baselines = initial.groupby("equipment_id").load_adjusted_temperature.mean()
-    df["temperature_deviation"] = df.temperature_mean - 0.15 * df.operating_load - df.equipment_id.map(equipment_baselines)
+    # At each hour, fit the equipment baseline from earlier observations only.
+    # Calibration freezes after the first 70 healthy hours; no future sample
+    # can affect an earlier feature value.
+    deviations = np.zeros(len(df), dtype=float)
+    for _, history in df.groupby("equipment_id"):
+        loads, temperatures = [], []
+        for row in history.itertuples():
+            if len(loads) >= 12:
+                slope, intercept = np.polyfit(loads, temperatures, 1)
+                deviations[row.Index] = row.temperature_mean - slope * row.operating_load - intercept
+            if row.hour < 70:
+                loads.append(row.operating_load)
+                temperatures.append(row.temperature_mean)
+    df["temperature_deviation"] = deviations
     df["heating_rate"] = df.groupby("equipment_id")["temperature_mean"].diff().fillna(0)
     return Simulation(df, pd.DataFrame(logs), truth)
