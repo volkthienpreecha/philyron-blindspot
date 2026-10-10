@@ -1,19 +1,24 @@
-# Verification record
+# Verification record — October 10, 2026
 
-## Local checks
+## Automated and local
 
-Six tests pass, covering real inference, normalized vectors, coverage changes, negation, uncertainty, equipment gates, delayed records, archives, idempotency, isolation, inspection/category validation and export provenance. TypeScript checking passes.
+Six tests pass and TypeScript checking passes. Tests cover real normalized MiniLM inference, coverage changes, negation, uncertainty, equipment/time gates, delayed records, missing archives, duplicate submissions, isolation and evidence-backed exports.
 
-Local production browser walkthrough: overview → North Star bearing → relevant note → partial coverage → synthetic inspection → confirmed review → one verified finding with four interval labels. A separate HTTP walkthrough checked the downloaded CSV contains the evidence ID and the JSON contains the pinned model version; a second visitor still saw zero related reports. Playwright CLI was used after computer-use runtime initialization failed.
+Local browser and HTTP walkthrough produced one verified finding and four interval labels. CSV evidence references and JSON model versions were checked. Refined screenshots were inspected at 1440×1000 and 390×844.
 
-Refined overview and investigation screenshots were checked at 1440×1000 and 390×844. Official SVG branding, concise counts, source evidence disclosure and responsive review layout were inspected.
+## Hosted preview
 
-## Hosted checks
+Connected preview: https://philyron-reporting-gaps-p5homa0vd.vercel.app
+Implementation revision: f512bcb.
 
-The first Vercel preview built but inference failed because ONNX Runtime was omitted from tracing. Explicit tracing of the runtime, its CommonJS package metadata and Linux native bindings fixed the failure.
+- Health reports supabase-postgres and the pinned MiniLM model.
+- Browser: North Star bearing → added captain note → zero related reports becomes one → partly reported, original coverage preserved → synthetic inspection → confirmed review → refresh → saved review remains → export drawer shows one finding and four labels.
+- Real Vercel inference returns 384 dimensions and norm approximately 1; explicit tracing includes native ONNX Runtime and CommonJS package metadata.
+- Supabase unauthorized RPC returned 403; concurrent workspace writes retained both receipts and revision 2.
+- Private tables have RLS and no direct anonymous access. Advisors' no-policy notices intentionally reflect denied direct access; public RPC warnings reflect deliberately callable functions guarded by an independent server secret and fixed search_path. The unrelated default event-trigger helper has execute privileges revoked. See https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable.
 
-Hosted retest on preview `dpl_AmDTSXG6nE7jNFZCAvtTA5ZAth7i`: GET `/api/embedding-check` returned HTTP 200, 384 dimensions and norm 1.0000000309832793 with the pinned model version. This establishes actual Vercel inference, not just compilation. This diagnostic preview is protected and is not the interview handoff URL.
+No accounts, user tables, laptop backend, proprietary integration or automatic retraining. Data and inspections are explicitly synthetic.
 
-Supabase setup remains pending: the authorized generic project cannot be restored after over 400 paused days. A new project is required. No durable cloud flow or production URL is verified yet.
+## Production
 
-Record the committed production revision, URL, inference response, persistence/isolation checks, mobile screenshots and downloaded export results before declaring completion.
+Production revision and repeated browser/HTTP verification will be recorded after deployment. Secrets remain server-only and ignored locally.
