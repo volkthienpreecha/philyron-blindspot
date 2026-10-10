@@ -40,3 +40,20 @@ The final small storage change uses one workspace snapshot for source text and v
 Captain-report clarity production release: f6158e14878c5c8e0d2cbb1c31da9204beb24406, deployment dpl_C7y3A2QqL43mg8kpBGQAs719DGfV, https://philyron-reporting-gaps.vercel.app.
 
 Repeated on the public production URL: the matching-report shortcut keeps North Star selected and changes coverage from 0/4 to 1/4; semantic search returns nine ranked original reports; the added note survives refresh. Independently repeated HTTP checks confirm negation does not create coverage, duplicate submissions are idempotent, confirmation without evidence returns 422, reviews persist, exports contain four labels with evidence references, and a separate visitor sees none of the added records. Production browser console has zero errors/warnings. The final watch-log dataset preserves all sensor intervals and uses vessel-specific phrasing and observation-aligned watch labels.
+
+## Reporting-goal audit, October 10
+
+Reproduced on production before fixing:
+
+- A healthy bearing clause followed by a vibrating/hot pump clause incorrectly closed the bearing reporting gap (cosine 0.81). Equipment references now constrain symptom clauses before embedding.
+- A question qualified by "Cannot tell yet" incorrectly counted as an affirmative issue. Unresolved observations now stay uncertain.
+- "Runs hotter ... and squeals" was classified as routine. Those everyday symptom forms now reach real semantic matching; negated versions remain excluded.
+- Failed report loading incorrectly displayed a successful empty-search state. It now displays unavailable records and an explicit retry.
+- A delayed search overwrote the user's reset to all logs. Reset now aborts and invalidates pending retrieval.
+- Fully covered patterns still carried an investigation-candidate label; unavailable archives displayed a coverage fraction. Both states now have distinct, accurate explanations.
+- Captain reports required an unrelated sensor-detail request. Report browsing now loads independently of sensor-detail availability.
+- Running an inspection erased the engineer's classification and supporting note. Inspection refresh now preserves that review draft.
+
+Eleven automated tests and TypeScript checks pass. Browser regressions were first observed failing, then repeated successfully against localhost:3002. The full browser/API flow checks ingestion, source search, complaint groups, equipment and intent gates, delayed reporting, idempotency, future-input rejection, unknown archives, evidence-required review, JSON/CSV exports, refresh persistence, isolated visitors, Escape dismissal, and responsive layouts at 1440×1000 and 390×844. Local browser console has no application errors or warnings. Temporary browser scripts and screenshots are outside the repository.
+
+The intent gate is a conservative English rule set, not a general language-understanding model. Explicit multi-equipment clauses and unresolved wording require clarification. Reporting coverage still uses equipment identity, observation time, affirmative symptoms and calibrated embedding similarity; synthetic inspection remains separate from matching. Arbitrary real fleet notes and operational thresholds require domain validation before integration.
