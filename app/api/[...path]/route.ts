@@ -1,6 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {identify,loadWorkspace,STORAGE_BACKEND} from '../../../lib/store';
-import {overview,detail,addNote,inspect,review,labels,csv,ServiceError} from '../../../lib/service';
+import {overview,detail,addNote,inspect,review,labels,csv,ServiceError,reports,searchReports} from '../../../lib/service';
 import {embed,MODEL_VERSION} from '../../../lib/embedding';
 import {ZodError} from 'zod';
 export const runtime='nodejs';
@@ -15,7 +15,9 @@ async function handle(req:NextRequest){
    if(origin&&origin!==req.nextUrl.origin)throw new ServiceError(403,'Use the same application origin.');
    if(Number(req.headers.get('content-length')??0)>10000)throw new ServiceError(413,'Request is too large.');
   }
-  if(req.method==='GET'&&path[0]==='overview')response=NextResponse.json(await overview(who.id));
+  if(req.method==='GET'&&path[0]==='reports')response=NextResponse.json(await reports(who.id));
+  else if(req.method==='POST'&&path[0]==='reports'&&path[1]==='search')response=NextResponse.json(await searchReports(who.id,await req.json()));
+  else if(req.method==='GET'&&path[0]==='overview')response=NextResponse.json(await overview(who.id));
   else if(req.method==='GET'&&path[0]==='cases'&&path[1])response=NextResponse.json(await detail(who.id,path[1]));
   else if(req.method==='GET'&&path[0]==='groups')response=NextResponse.json((await overview(who.id)).groups);
   else if(req.method==='POST'&&path[0]==='notes')response=NextResponse.json(await addNote(who.id,await req.json()),{status:201});
