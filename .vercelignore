@@ -1,0 +1,8 @@
+blindspot/
+tests/
+designs/
+data/
+.pytest*/
+__pycache__/
+.venv/
+models/

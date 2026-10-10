@@ -14,5 +14,6 @@ models/
 *.tsbuildinfo
 artifacts/
 .local/
+.playwright-cli/
 
 .vercel
