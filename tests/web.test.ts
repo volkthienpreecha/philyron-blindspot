@@ -80,3 +80,21 @@ test('verification needs matching evidence; labels and CSV retain provenance',as
  await assert.rejects(()=>inspect(id,heldout.id,{idempotencyKey:randomUUID()}));
  await review(id,target.id,{decision:'normal_behavior',idempotencyKey:randomUUID()});assert.equal((await labels(id)).length,0);
 });
+
+test('semantic report search retrieves source records and isolates visitor additions',async()=>{
+ const {reports,searchReports}=await import('../lib/service');
+ const id=identify().id, other=identify().id;
+ const catalog=await reports(id);
+ assert.equal(catalog.length,dataset.notes.length);
+ assert(catalog.every(n=>!('vector' in n)&&n.vessel&&n.observedAt));
+ const query='bearing vibrating and running hot under load';
+ const found=await searchReports(id,{query});
+ assert(found.results.length>0);
+ assert(found.results.some(n=>n.component==='bearing'&&n.intent==='issue'));
+ assert(found.results.every(n=>!('vector' in n)&&Number.isFinite(n.similarity)));
+ const unique='Bearing vibration and temperature rising under load during the midnight watch';
+ const added=await addNote(id,request(unique)) as {note:{id:string}};
+ assert((await searchReports(id,{query:unique})).results.some(n=>n.id===added.note.id));
+ assert(!(await searchReports(other,{query:unique})).results.some(n=>n.id===added.note.id));
+ await assert.rejects(()=>searchReports(id,{query:'x'}));
+});
