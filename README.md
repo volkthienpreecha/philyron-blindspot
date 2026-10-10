@@ -57,3 +57,9 @@ Dataset preparation requires Python dependencies in requirements.txt; serving th
 The existing blindspot/ code retains the synthetic generator, FastAPI experiment, and model comparison research. Run it with `uvicorn blindspot.api:app --reload` after installing requirements.txt. Its optional lexical fallback and synchronous retraining are research features; neither is used by the web app. The web demo ends at verified-label export and makes no model-improvement claim.
 
 Live interview demo: https://philyron-reporting-gaps.vercel.app
+
+## Captain-report clarity update
+
+The overview now shows a source captain note, a similar complaint on another vessel and computed sensor-interval coverage together. Captain reports has its own readable watch log and semantic search using the pinned server-side MiniLM model. Extracted symptoms, source timestamps, query similarity and links to sensor evidence make the matching inspectable. Routine/negated reports remain distinct from affirmative issue coverage. The matching-report shortcut performs real inference and storage, preserving the selected equipment while coverage changes.
+
+The redundant Investigations navigation, fake avatar, oversized counters and repeated pipeline footer were removed. Case details and evidence-backed export remain accessible. Mock logs have varied symptom phrasing and watch context, explicitly labeled synthetic; PDF import, OCR and handwritten-document recognition are not implemented.

@@ -30,3 +30,9 @@ Deployment: dpl_GeUjhScGQBtSEAnombeVyBTgDLE6.
 Repeated production browser flow: note ingestion → partly reported → synthetic inspection → confirmed review → refresh → persisted review → four labels in export drawer. Browser console: zero errors/warnings. Public HTTP checks independently verified Supabase storage, no coverage from negation or unrelated text, real inference changing coverage, duplicate note idempotency, HTTP 422 for confirmation without evidence, review persistence, CSV evidence references, four JSON labels and isolation of a second visitor. Missing-archive histories remain insufficient records. Desktop and mobile layouts were inspected; the note dialog closes with Escape.
 
 The documentation commit recording this release contains no application changes; the functional revision above is the tested implementation.
+
+## Captain-report clarity update, October 10
+
+Seven tests pass, including semantic source retrieval, paraphrases and workspace isolation. Hosted preview dpl_9HYadocR4gmPyNdLx1xEiBUFsW6V verifies real search and the before/after shortcut: North Star remains selected, coverage changes from zero to one of four intervals, and a query for bearing shaking and running hot retrieves nine ranked sources with actual MiniLM scores. An independent visitor sees only the 63 seeded records. Desktop and mobile source layouts were inspected and the hosted browser reports zero console errors.
+
+The final small storage change uses one workspace snapshot for source text and vectors, preventing mismatched concurrent retrieval. No simulated search result or report-coverage animation substitutes for server computation.

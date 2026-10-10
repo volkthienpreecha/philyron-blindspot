@@ -2,7 +2,7 @@ import {createHash,randomUUID} from 'node:crypto';
 import {z} from 'zod';
 import {dataset} from './dataset';
 import {embed,MODEL_VERSION} from './embedding';
-import {analyzeText} from './text';
+import {analyzeText,cosine} from './text';
 import {caseViews,complaintGroups} from './matching';
 import {loadWorkspace,mutate} from './store';
 import truth from '../fixtures/inspection-truth.json';
@@ -73,10 +73,9 @@ export function csv(rows:Awaited<ReturnType<typeof labels>>){
  const cell=(v:unknown)=>'"'+String(v??'').replace(/^[=+@-]/,"'$&").replaceAll('"','""')+'"';
  return [fields.join(','),...rows.map(r=>fields.map(f=>cell((r as Record<string,unknown>)[f])).join(','))].join('\r\n');
 }
-import {cosine} from './text';
 
-export async function reports(id:string){
- const w=await loadWorkspace(id);
+export async function reports(id:string,snapshot?:Workspace){
+ const w=snapshot??await loadWorkspace(id);
  return [...dataset.notes,...w.notes].filter(n=>Date.parse(n.observedAt)<=Date.parse(dataset.asOf)).map(n=>{
   const eq=dataset.equipment.find(e=>e.id===n.equipmentId)!;
   const {vector,...source}=n;
@@ -88,7 +87,7 @@ export async function searchReports(id:string,input:unknown){
  const {query,component}=searchSchema.parse(input),w=await loadWorkspace(id);
  const [vector]=await embed([query]);
  const vectors=new Map([...dataset.notes,...w.notes].map(n=>[n.id,n.vector]));
- const catalog=await reports(id);
+ const catalog=await reports(id,w);
  const results=catalog.filter(n=>!component||n.component===component).map(n=>({...n,similarity:cosine(vector,vectors.get(n.id)!)})).filter(n=>n.similarity>=.3).sort((a,b)=>b.similarity-a.similarity||a.id.localeCompare(b.id)).slice(0,9);
  return {query,modelVersion:MODEL_VERSION,results};
 }

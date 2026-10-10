@@ -1,31 +1,25 @@
-# Design direction, pending mockup selection
+# Design
 
-## Reference and scene
+## Scene and register
 
-A reliability engineer compares sensor patterns and captain reporting on a desktop in a bright shore office. The user now requests a premium white/glassy Apple-like treatment, using the attached Philyron logo. Product register, restrained blue and teal accents, translucent navigation and crisp evidence surfaces.
+A reliability engineer compares captain notes and sensor evidence on a desktop in a bright shore office. Product register: light surfaces, restrained blue actions, teal sensor traces, navy text, readable solid evidence panels.
 
-## Verified public brand tokens
+## Purpose
 
-From https://philyron.com/ and its live stylesheet on 2026-10-09:
+Make the reporting gap understandable from real source text and computed evidence. The overview pairs the selected sensor timeline with a captain-log excerpt, a similar complaint from another vessel, and interval coverage. Other vessels provide context only. A matching-report example submits actual text to inference and visibly updates the selected equipment.
 
-- Ink: #0e1525
-- Paper: #fafaf8
-- Signal blue: #2563ff
-- Teal: #0093b9
-- Deep teal: #00718c
-- Neutral rule: #e3e0d6
-- Type: Inter for interface text, JetBrains Mono for utility/data labels.
+## Navigation
 
-Use paper and cool near-white surfaces, navy text, faint blue-gray rules and gentle diffuse shadows. Glass should be purposeful on navigation or floating controls, with readable solid charts and tables. Implementation should express the selected palette in OKLCH. Blue handles primary actions and selection; teal handles sensor evidence; amber denotes reporting gaps, not confirmed failure.
+Overview, Captain reports, Verified labels. Investigation details remain reachable from a pattern or a source report. Report groups are secondary semantic context. No redundant Investigations navigation, fake profile, or repeated pipeline footer.
 
-## Shared composition
+## Source presentation
 
-Every concept must show sensor patterns, matching or missing captain reports, reporting coverage, and an investigation entry point. No decorative map, no fake risk probability, no model performance hero. Use the official attached geometric logo and wordmark.
+Captain reports use watch-log excerpts, vessel/equipment IDs, observation time and source provenance. Extracted affirmative symptoms are highlighted. Semantic query scores are distinct from sensor-pattern similarity, coverage and verified findings. Synthetic records are labeled; no OCR or real-fleet integration is implied.
 
-## Three mockup variants
+## Visual system
 
-1. Glass fleet overview: white evolution of the first reference, sidebar, gauge, coverage trend, reporting-gap queue, selected evidence preview.
-2. Pattern atlas: horizontal navigation, spacious full-width sensor/report coverage visualization, ranked blindspot panel, captain report clusters below.
-3. Investigation workspace: three-pane pattern list, central sensor and text evidence, right review/record-matching inspector. Compact top coverage summary.
+Preserve the official Philyron mark and existing Inter typography. Use the current OKLCH neutral tokens, blue primary actions and teal sensor traces. Amber identifies reporting gaps, not diagnosed faults. Plain statuses, solid selection backgrounds, no gradient tags. Source logs use typography and separators rather than nested cards.
 
-These are raster concepts only. Frontend implementation awaits the user's selection.
+## Interaction
+
+Real server inference and storage drive loading and results. A short opacity transition reinforces coverage updates; reduced-motion users get no animation. Semantic search, empty results, retryable errors, keyboard navigation and responsive layouts are required. Technical matching details remain expandable.
