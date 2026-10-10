@@ -30,8 +30,7 @@ export async function addNote(id:string,input:unknown){
  const digest=hash(request),existing=(await loadWorkspace(id)).receipts[request.idempotencyKey];
  if(existing){if(existing.hash!==digest)throw new ServiceError(409,'Submission key was reused with different content.');return existing.value;}
  if((await loadWorkspace(id)).notes.length>=60)throw new ServiceError(429,'This workspace has reached 60 notes.');
- const analysis=analyzeText(request.text);
- if(['bearing','gearbox','pump'].some(c=>c!==eq.component&&new RegExp(`\\b${c}\\b`,'i').test(request.text))&&!new RegExp(`\\b${eq.component}\\b`,'i').test(request.text))analysis.intent='uncertain';
+ const analysis=analyzeText(request.text,eq.component);
  const [vector]=await embed([`${eq.component}: ${analysis.affirmativeText||request.text}`]);
  const note:Note={id:randomUUID(),equipmentId:eq.id,text:request.text,observedAt:request.observedAt,ingestedAt:new Date().toISOString(),source:'Captain note · added in demo',addedDuringDemo:true,...analysis,vector,modelVersion:MODEL_VERSION};
  return mutate(id,request.idempotencyKey,digest,w=>{

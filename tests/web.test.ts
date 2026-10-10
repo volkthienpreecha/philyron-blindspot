@@ -30,6 +30,24 @@ test('negation, uncertain statements, mixed clauses',()=>{
  const mixed=analyzeText('No bearing noise; but the bearing is overheating.');
  assert.equal(mixed.intent,'issue');assert(!mixed.symptoms.includes('noise'));
 });
+test('uncertainty expressed after a symptom does not become affirmative coverage',async()=>{
+ const id=identify().id;
+ for(const text of ['Bearing is overheating? Cannot tell yet.','Bearing is vibrating. Not sure whether this is real.']){
+  const result=await addNote(id,request(text)) as {note:NoteForTest};
+  assert.equal(result.note.intent,'uncertain');
+ }
+ assert.equal(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals,0);
+});
+type NoteForTest={intent:string;affirmativeText:string};
+test('symptoms on other equipment cannot cover a selected healthy bearing',async()=>{
+ const id=identify().id;
+ for(const text of ['Bearing normal. Pump vibration and temperature are rising under load.','Bearing has no noise but pump is overheating and vibrating.','Pump and bearing vibration increasing; unable to locate the source.']){
+  await addNote(id,request(text));
+  assert.equal(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals,0,text);
+ }
+ await addNote(id,request('Pump is normal. Bearing vibration and temperature are rising under load.'));
+ assert(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals>0);
+});
 test('real embeddings match held-out paraphrases and reject unrelated text',async()=>{
  const texts=['bearing: Bearing has started rattling and is hotter while working','bearing: Chart table light has stopped working'];
  const [positive,negative]=await embed(texts);
