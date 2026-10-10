@@ -10,7 +10,7 @@ Reliability engineers and ML staff investigate sensor patterns with little or no
 
 ## Product Purpose
 
-Blindspot Discovery groups unstructured captain reports using embeddings, compares those groups with recurring sensor patterns, and prioritizes candidate gaps in reporting. The central question is: what abnormal behavior are maintenance records failing to capture? Human verification determines which cases can become evidence for Philyron's existing ML system. Sparse reporting alone does not establish a hidden failure.
+The reporting-gap workspace groups unstructured captain reports using embeddings, compares those groups with recurring sensor patterns, and prioritizes candidate gaps in reporting. The central question is: what abnormal behavior are maintenance records failing to capture? Human verification determines which cases can become evidence for Philyron's existing ML system. Sparse reporting alone does not establish a hidden failure.
 
 ## Brand Personality
 

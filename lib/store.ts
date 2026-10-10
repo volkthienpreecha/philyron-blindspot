@@ -7,13 +7,16 @@ const cloud=!!process.env.SUPABASE_URL&&!process.env.DEMO_DATA_DIR;
 const directory=process.env.DEMO_DATA_DIR||path.join(process.cwd(),'.local');
 let db:DatabaseSync|undefined;
 let secret=process.env.WORKSPACE_SECRET;
-if(!cloud){
+if(!cloud&&!process.env.VERCEL){
  mkdirSync(directory,{recursive:true});
  const secretFile=path.join(directory,'workspace-secret');
  if(!secret&&!existsSync(secretFile))writeFileSync(secretFile,randomBytes(32).toString('hex'),{mode:0o600});
  secret??=readFileSync(secretFile,'utf8');
  db=new DatabaseSync(path.join(directory,'demo.sqlite3'));
  db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS workspaces (id TEXT PRIMARY KEY, data TEXT NOT NULL)');
+}else if(!cloud){
+ // A hosted preview must fail closed until durable storage is configured.
+ secret??=randomBytes(32).toString('hex');
 }else if(!secret)throw new Error('WORKSPACE_SECRET must be configured.');
 function signature(id:string){return createHmac('sha256',secret!).update(id).digest('hex');}
 export function identify(cookie?:string){
@@ -28,6 +31,7 @@ async function rpc(name:string,args:Record<string,unknown>){
  return response.json();
 }
 function localWorkspace(id:string):Workspace {
+ if(!db)throw new Error('Configure Supabase persistence before serving this deployment.');
  const row=db!.prepare('SELECT data FROM workspaces WHERE id=?').get(id) as {data:string}|undefined;
  return row?JSON.parse(row.data):empty(id);
 }
@@ -36,6 +40,7 @@ export async function loadWorkspace(id:string):Promise<Workspace> {
  return localWorkspace(id);
 }
 export async function mutate<T>(id:string,key:string,hash:string,action:(w:Workspace)=>T):Promise<T> {
+ if(!cloud&&!db)throw new Error('Configure Supabase persistence before serving this deployment.');
  for(let attempt=0;attempt<5;attempt++){
   if(!cloud)db!.exec('BEGIN IMMEDIATE');
   try {
