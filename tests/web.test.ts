@@ -39,6 +39,13 @@ test('uncertainty expressed after a symptom does not become affirmative coverage
  assert.equal(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals,0);
 });
 type NoteForTest={intent:string;affirmativeText:string};
+test('everyday captain wording reaches semantic matching instead of being discarded as routine',async()=>{
+ const id=identify().id;
+ const result=await addNote(id,request('The bearing runs hotter when loaded and squeals on the passage.')) as {note:NoteForTest};
+ assert.equal(result.note.intent,'issue');
+ assert(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals>0);
+ assert.equal(analyzeText('No hotter bearing or squealing found.').intent,'negated');
+});
 test('symptoms on other equipment cannot cover a selected healthy bearing',async()=>{
  const id=identify().id;
  for(const text of ['Bearing normal. Pump vibration and temperature are rising under load.','Bearing has no noise but pump is overheating and vibrating.','Pump and bearing vibration increasing; unable to locate the source.']){

@@ -1,4 +1,4 @@
-const symptomPattern = /\b(noise|noisy|noisier|rattl\w*|vibrat\w*|shak\w*|hot|heat\w*|temperature|overheat\w*|pressure|cavitat\w*|grind\w*|hum\w*|warm\w*|leak\w*)\b/gi;
+const symptomPattern = /\b(noise|noisy|noisier|rattl\w*|vibrat\w*|shak\w*|hot(?:ter|test)?|squeal\w*|heat\w*|temperature|overheat\w*|pressure|cavitat\w*|grind\w*|hum\w*|warm\w*|leak\w*)\b/gi;
 export function analyzeText(text:string,component?:string) {
   const clauses=text.split(/[.;\n]|\b(?:but|however|although)\b/i).map(x=>x.trim()).filter(Boolean);
   const affirmative:string[]=[]; const symptoms:string[]=[];
