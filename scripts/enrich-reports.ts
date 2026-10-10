@@ -28,5 +28,6 @@ raw.notes=raw.notes.filter((n:any)=>n.id!=='watch-V05-BEARING-01-partial').map((
 // first two intervals, while later recurrence still lacks a captain report.
 raw.notes.push({id:'watch-V05-BEARING-01-partial',equipmentId:'V05-BEARING-01',text:'On the evening watch the bearing developed a rattling noise and felt hotter as engine load rose. Passed the observation to the duty engineer at handover.',observedAt:'2026-01-03T20:00:00+00:00',ingestedAt:'2026-01-03T21:00:00+00:00',source:'Synthetic captain log · watch 2000–2400',addedDuringDemo:false});
 raw.version='synthetic-maritime-2704-captain-logs-v3';
+raw.featuredCaseId='case-V05-BEARING-01';
 await fs.writeFile('fixtures/sensor-data.json',JSON.stringify(raw));
 console.log('Prepared '+raw.notes.length+' synthetic watch-log excerpts.');
