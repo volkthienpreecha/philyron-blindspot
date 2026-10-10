@@ -4,6 +4,9 @@ import {mkdtempSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {ReportFlow} from '../components/captain-reports';
 process.env.DEMO_DATA_DIR=mkdtempSync(path.join(tmpdir(),'philyron-tests-'));
 const {dataset}=await import('../lib/dataset');
 const {embed}=await import('../lib/embedding');
@@ -90,6 +93,14 @@ test('cross-asset and future reports never create coverage; missing archives rem
  assert.equal(assessment(target,[{...n,equipmentId:target.equipmentId,observedAt:'2027-01-01T00:00:00Z'}]).relatedReports,0);
  const unknown=dataset.cases.find(c=>!c.recordsAvailable)!;
  assert.equal(assessment(unknown,dataset.notes).coverage,'insufficient_records');
+});
+test('covered patterns are not presented as reporting-gap investigation candidates',()=>{
+ const covered=caseViews({id:'render',version:0,notes:[],reviews:[],inspections:[],receipts:{}}).find(c=>c.coverage==='covered')!;
+ const html=renderToStaticMarkup(createElement(ReportFlow,{focus:{...covered,threshold:dataset.matchThreshold},onExample:()=>{}}));
+ assert(!html.includes('Investigation candidate'),'Fully reported patterns must not be labeled as reporting gaps');
+ const unknown=caseViews({id:'render',version:0,notes:[],reviews:[],inspections:[],receipts:{}}).find(c=>c.coverage==='insufficient_records')!;
+ const missing=renderToStaticMarkup(createElement(ReportFlow,{focus:{...unknown,threshold:dataset.matchThreshold},onExample:()=>{}}));
+ assert(!missing.includes('abnormal intervals covered'),'Unavailable archives cannot establish reporting completeness');
 });
 test('verification needs matching evidence; labels and CSV retain provenance',async()=>{
  const id=identify().id;
