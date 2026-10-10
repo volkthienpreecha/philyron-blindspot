@@ -23,3 +23,9 @@ Preserve the official Philyron mark and existing Inter typography. Use the curre
 ## Interaction
 
 Real server inference and storage drive loading and results. A short opacity transition reinforces coverage updates; reduced-motion users get no animation. Semantic search, empty results, retryable errors, keyboard navigation and responsive layouts are required. Technical matching details remain expandable.
+
+## Partial reporting example and verification
+
+A fresh visitor starts with the dataset's curated North Star example: one genuine synthetic watch-log report covers two of four abnormal intervals under the existing ±24-hour matching rule. Teal shading marks reported intervals; amber marks intervals with no matching issue report. This presentation does not change the ranked fleet queue. Adding a relevant note at the end of the history changes coverage from two to three intervals through real inference; remaining gaps stay visible.
+
+Engineer review has two primary steps: run a clearly labeled synthetic inspection, then explicitly confirm the displayed finding and open its label downloads. Inspection category and evidence reference accompany confirmation automatically. No evidence, a normal inspection result, or a held-out history cannot produce a confirmed label. Supporting notes and alternative review decisions remain available; saved findings offer downloads directly.
