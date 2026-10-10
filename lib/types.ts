@@ -1,0 +1,9 @@
+export type Equipment = {id:string;vesselId:string;vessel:string;component:string;name:string;recordsAvailable:boolean;split:string};
+export type Interval = {start:string;end:string;durationHours:number;peakScore:number};
+export type SensorCase = Equipment & {equipmentId:string;description:string;query:string;detectedAt:string;asOf:string;intervals:Interval[];eventCount:number;abnormalHours:number;score:number;threshold:number;deviations:Record<string,number>;baseline:{vibration:number;temperature:number};telemetry:{timestamp:string;vibration:number;temperature:number;load:number;abnormal:boolean}[];vector:number[]};
+export type Note = {id:string;equipmentId:string;text:string;observedAt:string;ingestedAt:string;source:string;addedDuringDemo:boolean;intent:'issue'|'routine'|'negated'|'uncertain';symptoms:string[];affirmativeText:string;vector:number[];modelVersion:string};
+export type Review = {caseId:string;decision:'confirmed_issue'|'normal_behavior'|'needs_investigation';category?:string;evidenceId?:string;notes:string;reviewedAt:string;eligible:boolean};
+export type Inspection = {id:string;caseId:string;outcome:string;category:string|null;inspectedAt:string;source:string};
+export type Workspace = {id:string;version:number;notes:Note[];reviews:Review[];inspections:Inspection[];receipts:Record<string,{hash:string;value:unknown}>};
+export type Coverage = 'uncovered'|'partial'|'covered'|'insufficient_records';
+export type CaseView = SensorCase & {coverage:Coverage;originalCoverage:Coverage;relatedReports:number;recordsSearched:number;coveredIntervals:number;lateReports:number;matches:(Note & {similarity:number;timing:string})[];similar:(Note & {similarity:number;vessel:string})[];review:Review|null};

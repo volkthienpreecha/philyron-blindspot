@@ -1,0 +1,58 @@
+{
+  "modelVersion": "MiniLM-L6-v2@751bff37182d3f1213fa05d7196b954e230abad9:q8:mean:normalized",
+  "development": [
+    {
+      "query": "bearing increasing vibration noise and temperature under load",
+      "text": "bearing: Bearing is shaking and running hot",
+      "related": true,
+      "score": 0.7243840073424859
+    },
+    {
+      "query": "bearing increasing vibration noise and temperature under load",
+      "text": "bearing: Growing bearing noise and heat under load",
+      "related": true,
+      "score": 0.8438219603881972
+    },
+    {
+      "query": "pump unusual heat and temperature spike",
+      "text": "pump: Pump temperature climbed sharply during operation",
+      "related": true,
+      "score": 0.7684210321230218
+    },
+    {
+      "query": "gearbox increasing vibration noise and temperature under load",
+      "text": "gearbox: Gearbox rattling and heating under load",
+      "related": true,
+      "score": 0.766984246488589
+    },
+    {
+      "query": "bearing increasing vibration noise and temperature under load",
+      "text": "bearing: Deck navigation light is flickering",
+      "related": false,
+      "score": 0.3298690402380454
+    },
+    {
+      "query": "pump unusual heat and temperature spike",
+      "text": "pump: Steering wheel vibrates at low speed",
+      "related": false,
+      "score": 0.3420206682336641
+    },
+    {
+      "query": "gearbox increasing vibration noise and temperature under load",
+      "text": "gearbox: Cabin air conditioner is leaking",
+      "related": false,
+      "score": 0.3751727345765956
+    },
+    {
+      "query": "bearing increasing vibration noise and temperature under load",
+      "text": "bearing: Pump discharge pressure is low",
+      "related": false,
+      "score": 0.40493297454472127
+    }
+  ],
+  "threshold": 0.56,
+  "f1": 1,
+  "precision": 1,
+  "recall": 1,
+  "scope": "Small synthetic development set; not field validation"
+}

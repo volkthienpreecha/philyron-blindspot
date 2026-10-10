@@ -5,3 +5,14 @@ __pycache__/
 *.pyc
 data/
 .env
+node_modules/
+.next/
+.vercel/
+.env*
+!.env.example
+models/
+*.tsbuildinfo
+artifacts/
+.local/
+
+.vercel
