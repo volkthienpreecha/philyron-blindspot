@@ -8,7 +8,7 @@ const context=[
  'Observed on the passage between ports. The change was more noticeable when load increased.',
  'Entered in the watch handover log. The engineer has been asked to inspect the equipment.',
 ];
-raw.notes=raw.notes.map((n:any,i:number)=>{
+raw.notes=raw.notes.filter((n:any)=>n.id!=='watch-V05-BEARING-01-partial').map((n:any,i:number)=>{
  const original=n.text.split('. ')[0];
  const equipment=raw.equipment.find((e:any)=>e.id===n.equipmentId);
  const component=equipment.component;
@@ -24,6 +24,9 @@ raw.notes=raw.notes.map((n:any,i:number)=>{
  const text=original.startsWith('Increasing')?variants[variation]:original;
  return {...n,text:text+'. '+(original.startsWith('Routine')?'Scheduled engine-room round completed. Logged the observation for the next watch.':original.startsWith('No ')?'Checked during the engine-room round. Recorded the current condition at handover.':context[variation]),source:'Synthetic captain log · watch '+String(Math.floor(new Date(n.observedAt).getUTCHours()/4)*4).padStart(2,'0')+'00–'+String(Math.floor(new Date(n.observedAt).getUTCHours()/4)*4+4).padStart(2,'0')+'00'};
 });
-raw.version='synthetic-maritime-2704-captain-logs-v2';
+// A reproducible partial-coverage story: an early observation explains the
+// first two intervals, while later recurrence still lacks a captain report.
+raw.notes.push({id:'watch-V05-BEARING-01-partial',equipmentId:'V05-BEARING-01',text:'On the evening watch the bearing developed a rattling noise and felt hotter as engine load rose. Passed the observation to the duty engineer at handover.',observedAt:'2026-01-03T20:00:00+00:00',ingestedAt:'2026-01-03T21:00:00+00:00',source:'Synthetic captain log · watch 2000–2400',addedDuringDemo:false});
+raw.version='synthetic-maritime-2704-captain-logs-v3';
 await fs.writeFile('fixtures/sensor-data.json',JSON.stringify(raw));
 console.log('Prepared '+raw.notes.length+' synthetic watch-log excerpts.');

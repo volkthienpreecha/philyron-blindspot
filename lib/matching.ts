@@ -1,15 +1,15 @@
 import { dataset } from './dataset';
 import { cosine } from './text';
+import {inReportWindow,reportCoversInterval} from './report-coverage';
 import type {SensorCase,Note,Workspace,Coverage,CaseView} from './types';
-const day=24*60*60*1000;
 export function intervalRelated(c:SensorCase,n:Note) {
-  return c.intervals.some(i=>Date.parse(n.observedAt)>=Date.parse(i.start)-day&&Date.parse(n.observedAt)<=Date.parse(i.end)+day);
+  return c.intervals.some(i=>inReportWindow(i,n.observedAt));
 }
 export function assessment(c:SensorCase,notes:Note[],original=false) {
   const visible=notes.filter(n=>n.equipmentId===c.equipmentId&&Date.parse(n.observedAt)<=Date.parse(c.asOf)&&(!original||!n.addedDuringDemo&&Date.parse(n.ingestedAt)<=Date.parse(c.detectedAt)));
   const matches=visible.map(n=>({...n,similarity:cosine(c.vector,n.vector),timing:n.addedDuringDemo||Date.parse(n.ingestedAt)>Date.parse(c.detectedAt)?'Reported later':'Known at detection'})).filter(n=>intervalRelated(c,n)).sort((a,b)=>b.similarity-a.similarity||a.id.localeCompare(b.id));
   const related=matches.filter(n=>n.intent==='issue'&&n.similarity>=dataset.matchThreshold);
-  const covered=c.intervals.filter(i=>related.some(n=>Date.parse(n.observedAt)>=Date.parse(i.start)-day&&Date.parse(n.observedAt)<=Date.parse(i.end)+day)).length;
+  const covered=c.intervals.filter(i=>related.some(n=>reportCoversInterval(i,n,dataset.matchThreshold))).length;
   const coverage:Coverage=!c.recordsAvailable?'insufficient_records':covered===c.intervals.length?'covered':covered?'partial':'uncovered';
   return {coverage,recordsSearched:visible.length,coveredIntervals:covered,relatedReports:related.length,lateReports:related.filter(n=>n.timing==='Reported later').length,matches};
 }
