@@ -4,6 +4,9 @@ import {mkdtempSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {ReportFlow} from '../components/captain-reports';
 process.env.DEMO_DATA_DIR=mkdtempSync(path.join(tmpdir(),'philyron-tests-'));
 const {dataset}=await import('../lib/dataset');
 const {embed}=await import('../lib/embedding');
@@ -29,6 +32,31 @@ test('negation, uncertain statements, mixed clauses',()=>{
  assert.equal(analyzeText('Routine service completed.').intent,'routine');
  const mixed=analyzeText('No bearing noise; but the bearing is overheating.');
  assert.equal(mixed.intent,'issue');assert(!mixed.symptoms.includes('noise'));
+});
+test('uncertainty expressed after a symptom does not become affirmative coverage',async()=>{
+ const id=identify().id;
+ for(const text of ['Bearing is overheating? Cannot tell yet.','Bearing is vibrating. Not sure whether this is real.']){
+  const result=await addNote(id,request(text)) as {note:NoteForTest};
+  assert.equal(result.note.intent,'uncertain');
+ }
+ assert.equal(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals,0);
+});
+type NoteForTest={intent:string;affirmativeText:string};
+test('everyday captain wording reaches semantic matching instead of being discarded as routine',async()=>{
+ const id=identify().id;
+ const result=await addNote(id,request('The bearing runs hotter when loaded and squeals on the passage.')) as {note:NoteForTest};
+ assert.equal(result.note.intent,'issue');
+ assert(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals>0);
+ assert.equal(analyzeText('No hotter bearing or squealing found.').intent,'negated');
+});
+test('symptoms on other equipment cannot cover a selected healthy bearing',async()=>{
+ const id=identify().id;
+ for(const text of ['Bearing normal. Pump vibration and temperature are rising under load.','Bearing has no noise but pump is overheating and vibrating.','Pump and bearing vibration increasing; unable to locate the source.']){
+  await addNote(id,request(text));
+  assert.equal(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals,0,text);
+ }
+ await addNote(id,request('Pump is normal. Bearing vibration and temperature are rising under load.'));
+ assert(caseViews(await loadWorkspace(id)).find(c=>c.id===target.id)!.coveredIntervals>0);
 });
 test('real embeddings match held-out paraphrases and reject unrelated text',async()=>{
  const texts=['bearing: Bearing has started rattling and is hotter while working','bearing: Chart table light has stopped working'];
@@ -65,6 +93,14 @@ test('cross-asset and future reports never create coverage; missing archives rem
  assert.equal(assessment(target,[{...n,equipmentId:target.equipmentId,observedAt:'2027-01-01T00:00:00Z'}]).relatedReports,0);
  const unknown=dataset.cases.find(c=>!c.recordsAvailable)!;
  assert.equal(assessment(unknown,dataset.notes).coverage,'insufficient_records');
+});
+test('covered patterns are not presented as reporting-gap investigation candidates',()=>{
+ const covered=caseViews({id:'render',version:0,notes:[],reviews:[],inspections:[],receipts:{}}).find(c=>c.coverage==='covered')!;
+ const html=renderToStaticMarkup(createElement(ReportFlow,{focus:{...covered,threshold:dataset.matchThreshold},onExample:()=>{}}));
+ assert(!html.includes('Investigation candidate'),'Fully reported patterns must not be labeled as reporting gaps');
+ const unknown=caseViews({id:'render',version:0,notes:[],reviews:[],inspections:[],receipts:{}}).find(c=>c.coverage==='insufficient_records')!;
+ const missing=renderToStaticMarkup(createElement(ReportFlow,{focus:{...unknown,threshold:dataset.matchThreshold},onExample:()=>{}}));
+ assert(!missing.includes('abnormal intervals covered'),'Unavailable archives cannot establish reporting completeness');
 });
 test('verification needs matching evidence; labels and CSV retain provenance',async()=>{
  const id=identify().id;
