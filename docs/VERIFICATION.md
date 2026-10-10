@@ -22,3 +22,11 @@ No accounts, user tables, laptop backend, proprietary integration or automatic r
 ## Production
 
 Production revision and repeated browser/HTTP verification will be recorded after deployment. Secrets remain server-only and ignored locally.
+
+Verified production release: https://philyron-reporting-gaps.vercel.app
+Functional commit: 621cda95ff8d66e8d4ba8dad06a647efae50229a (merged PR #1).
+Deployment: dpl_GeUjhScGQBtSEAnombeVyBTgDLE6.
+
+Repeated production browser flow: note ingestion → partly reported → synthetic inspection → confirmed review → refresh → persisted review → four labels in export drawer. Browser console: zero errors/warnings. Public HTTP checks independently verified Supabase storage, no coverage from negation or unrelated text, real inference changing coverage, duplicate note idempotency, HTTP 422 for confirmation without evidence, review persistence, CSV evidence references, four JSON labels and isolation of a second visitor. Missing-archive histories remain insufficient records. Desktop and mobile layouts were inspected; the note dialog closes with Escape.
+
+The documentation commit recording this release contains no application changes; the functional revision above is the tested implementation.

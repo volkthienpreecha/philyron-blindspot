@@ -55,3 +55,5 @@ Dataset preparation requires Python dependencies in requirements.txt; serving th
 ## Separate Python research prototype
 
 The existing blindspot/ code retains the synthetic generator, FastAPI experiment, and model comparison research. Run it with `uvicorn blindspot.api:app --reload` after installing requirements.txt. Its optional lexical fallback and synchronous retraining are research features; neither is used by the web app. The web demo ends at verified-label export and makes no model-improvement claim.
+
+Live interview demo: https://philyron-reporting-gaps.vercel.app
