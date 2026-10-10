@@ -13,7 +13,7 @@ export class ServiceError extends Error {constructor(public status:number,messag
 const caseFor=(id:string)=>{const c=dataset.cases.find(c=>c.id===id);if(!c)throw new ServiceError(404,'Investigation not found.');return c;};
 export async function overview(id:string) {
  const w=await loadWorkspace(id),cases=caseViews(w);
- return {datasetVersion:dataset.version,modelVersion:MODEL_VERSION,asOf:dataset.asOf,version:w.version,equipment:dataset.equipment,
+ return {datasetVersion:dataset.version,modelVersion:MODEL_VERSION,asOf:dataset.asOf,featuredCaseId:dataset.featuredCaseId,version:w.version,equipment:dataset.equipment,
   summary:{vessels:18,equipment:dataset.equipment.length,gaps:cases.filter(c=>['uncovered','partial'].includes(c.coverage)&&c.review?.decision!=='normal_behavior'&&c.review?.decision!=='confirmed_issue').length,verified:w.reviews.filter(r=>r.eligible).length,notes:dataset.notes.length+w.notes.length},
   cases:cases.map(c=>({...c,vector:undefined,telemetry:undefined,matches:undefined,similar:undefined})),groups:complaintGroups([...dataset.notes,...w.notes])};
 }

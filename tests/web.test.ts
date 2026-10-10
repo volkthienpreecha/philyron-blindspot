@@ -7,6 +7,7 @@ import {randomUUID} from 'node:crypto';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {ReportFlow} from '../components/captain-reports';
+import EvidenceChart from '../components/chart';
 process.env.DEMO_DATA_DIR=mkdtempSync(path.join(tmpdir(),'philyron-tests-'));
 const {dataset}=await import('../lib/dataset');
 const {embed}=await import('../lib/embedding');
@@ -16,6 +17,26 @@ const {identify,loadWorkspace}=await import('../lib/store');
 const {addNote,review,inspect,labels,csv}=await import('../lib/service');
 const target=dataset.cases.find(c=>c.equipmentId==='V02-BEARING-01')!;
 const request=(text:string)=>({equipmentId:target.equipmentId,text,observedAt:target.asOf,idempotencyKey:randomUUID()});
+test('seeded overview story has a real report covering two intervals while two remain uncovered',()=>{
+ const story=dataset.cases.find(c=>c.equipmentId==='V05-BEARING-01')!;
+ const result=assessment(story,dataset.notes);
+ assert.equal(result.coverage,'partial');
+ assert.equal(result.relatedReports,1);
+ assert.equal(result.coveredIntervals,2);
+ assert.equal(story.eventCount-result.coveredIntervals,2);
+ const note=dataset.notes.find(n=>n.id==='watch-V05-BEARING-01-partial')!;
+ assert(note.text.includes('rattling'));
+ assert.equal(note.vector.length,384);
+ assert.equal(note.addedDuringDemo,false);
+ assert.equal(assessment(story,dataset.notes,true).coverage,'partial');
+});
+test('sensor chart distinguishes covered intervals from intervals still lacking reports',()=>{
+ const story=dataset.cases.find(c=>c.equipmentId==='V05-BEARING-01')!;
+ const matches=assessment(story,dataset.notes).matches;
+ const html=renderToStaticMarkup(createElement(EvidenceChart,{points:story.telemetry,reports:matches,threshold:dataset.matchThreshold}));
+ assert.equal((html.match(/data-coverage="covered"/g)||[]).length,2);
+ assert.equal((html.match(/data-coverage="uncovered"/g)||[]).length,2);
+});
 test('sealed evidence, distinct intervals and snapshot boundaries',()=>{
  assert(!JSON.stringify(dataset).includes('failure_at'));
  for(const c of dataset.cases){
